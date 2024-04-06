@@ -1,0 +1,44 @@
+{
+    "name": "did-method-moon",
+    "version": "1.0.0",
+    "description": "Library for generating and working with Secp256k1VerificationKey2018 key pairs",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "scripts": {
+        "build": "tsc",
+        "test": "jest",
+        "coverage": "jest --coverage",
+        "lint": "eslint . --ext .ts",
+        "pretty": "prettier --write \"./**/*.{ts,tsx,js,jsx,json,scss,css}\"",
+        "configure-husky": "npx husky install && npx husky add .husky/pre-commit \"npx --no-install lint-staged\""
+    },
+    "lint-staged": {
+        "**/*.{ts,js,json}": [
+            "prettier --write ."
+        ]
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "lint-staged"
+        }
+    },
+    "author": "Radical Ledger Technologies",
+    "license": "ISC",
+    "devDependencies": {
+        "@types/bip32": "^2.0.0",
+        "@types/node": "^20.11.25",
+        "bip32": "^4.0.0",
+        "husky": "8.0.1",
+        "lint-staged": "13.0.3",
+        "prettier": "^3.2.5",
+        "tiny-secp256k1": "^2.2.3",
+        "typescript": "^5.4.2"
+    },
+    "dependencies": {
+        "@types/jest": "^29.5.12",
+        "@types/secp256k1": "^4.0.6",
+        "jest": "^29.7.0",
+        "secp256k1": "^5.0.0",
+        "ts-jest": "^29.1.2"
+    }
+}
