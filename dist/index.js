@@ -40,8 +40,14 @@ var __importStar =
         __setModuleDefault(result, mod);
         return result;
     };
+var __importDefault =
+    (this && this.__importDefault) ||
+    function (mod) {
+        return mod && mod.__esModule ? mod : { default: mod };
+    };
 Object.defineProperty(exports, '__esModule', { value: true });
 const secp256k1 = __importStar(require('secp256k1'));
+const keccak256_1 = __importDefault(require('keccak256'));
 class MoonMethod {
     /**
      *
@@ -54,10 +60,10 @@ class MoonMethod {
             (_a = node.privateKey) === null || _a === void 0 ? void 0 : _a.toString('hex');
         const chainCode =
             (_b = node.chainCode) === null || _b === void 0 ? void 0 : _b.toString('hex');
-        const address =
+        const publicKey =
             (_c = node.publicKey) === null || _c === void 0 ? void 0 : _c.toString('hex');
-        const publicKey = address;
-        const did = `did:moon:0x${address}`;
+        const address = this.getAddressFromPublicKey(publicKey);
+        const did = `did:moon:${address}`;
         const { didDocument } = await this.getDocument(privateKey);
         return { did, address, privateKey, publicKey, chainCode, didDocument };
     }
@@ -98,15 +104,24 @@ class MoonMethod {
         const privateKey = new Uint8Array(Buffer.from(seed, 'hex'));
         const verified = secp256k1.privateKeyVerify(privateKey);
         if (verified) {
-            const publicKey = secp256k1.publicKeyCreate(privateKey, true);
-            jwk.ethereumAddress = `0x${Buffer.from(publicKey).toString('hex')}`;
-            jwk.owner = `did:moon:0x${Buffer.from(publicKey).toString('hex')}`;
+            const publicKeyBuffer = secp256k1.publicKeyCreate(privateKey, true);
+            const publicKey = Buffer.from(publicKeyBuffer).toString('hex');
+            jwk.ethereumAddress = this.getAddressFromPublicKey(publicKey);
+            jwk.owner = `did:moon:${jwk.ethereumAddress}`;
             jwk.id = `${jwk.owner}#owner`;
             if (includePrivateKey) {
                 jwk.publicKeyHex = privateKey;
             }
         }
         return jwk;
+    }
+    getAddressFromPublicKey(publicKey) {
+        const hashPublicKey = (0, keccak256_1.default)(publicKey).toString('hex');
+        /* Calculate the starting index to get the last twenty bytes. Each byte is represented by 2 characters in a hex string */
+        const startIndex = hashPublicKey.length - 20 * 2;
+        /* Extract the last twenty bytes */
+        const lastTwentyBytes = hashPublicKey.substring(startIndex);
+        return `0x${lastTwentyBytes}`;
     }
 }
 exports.default = MoonMethod;
