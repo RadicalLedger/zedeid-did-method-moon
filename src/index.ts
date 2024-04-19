@@ -2,6 +2,16 @@ import * as secp256k1 from 'secp256k1';
 import keccak256 from 'keccak256';
 
 export default class MoonMethod {
+    private chain: string = 'moon';
+
+    /**
+     *
+     * @param chain - chain type
+     */
+    constructor(chain?: string) {
+        if (chain) this.chain += `:${chain}`;
+    }
+
     /**
      *
      * @param node BIP32Interface
@@ -12,7 +22,7 @@ export default class MoonMethod {
         const chainCode = node.chainCode?.toString('hex');
         const publicKey = node.publicKey?.toString('hex') as string;
         const address = this.getAddressFromPublicKey(publicKey);
-        const did = `did:moon:${address}`;
+        const did = `did:${this.chain}:${address}`;
 
         const { didDocument } = await this.getDocument(privateKey as string);
         return { did, address, privateKey, publicKey, chainCode, didDocument };
@@ -67,7 +77,7 @@ export default class MoonMethod {
             const publicKeyBuffer = secp256k1.publicKeyCreate(privateKey, true);
             const publicKey = Buffer.from(publicKeyBuffer).toString('hex');
             jwk.ethereumAddress = this.getAddressFromPublicKey(publicKey);
-            jwk.owner = `did:moon:${jwk.ethereumAddress}`;
+            jwk.owner = `did:${this.chain}:${jwk.ethereumAddress}`;
             jwk.id = `${jwk.owner}#owner`;
 
             if (includePrivateKey) {

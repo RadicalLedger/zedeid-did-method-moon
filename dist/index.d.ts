@@ -1,4 +1,10 @@
 export default class MoonMethod {
+    private chain;
+    /**
+     *
+     * @param chain - chain type
+     */
+    constructor(chain?: string);
     /**
      *
      * @param node BIP32Interface
