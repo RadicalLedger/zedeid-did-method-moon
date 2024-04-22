@@ -70,7 +70,7 @@ class MoonMethod {
             (_b = node.chainCode) === null || _b === void 0 ? void 0 : _b.toString('hex');
         const publicKey =
             (_c = node.publicKey) === null || _c === void 0 ? void 0 : _c.toString('hex');
-        const address = this.getAddressFromPublicKey(publicKey);
+        const address = this.getAddressFromPublicKey(this.getPublicKey(privateKey, false));
         const did = `did:${this.chain}:${address}`;
         const { didDocument } = await this.getDocument(privateKey);
         return { did, address, privateKey, publicKey, chainCode, didDocument };
@@ -112,9 +112,7 @@ class MoonMethod {
         const privateKey = new Uint8Array(Buffer.from(seed, 'hex'));
         const verified = secp256k1.privateKeyVerify(privateKey);
         if (verified) {
-            const publicKeyBuffer = secp256k1.publicKeyCreate(privateKey, true);
-            const publicKey = Buffer.from(publicKeyBuffer).toString('hex');
-            jwk.ethereumAddress = this.getAddressFromPublicKey(publicKey);
+            jwk.ethereumAddress = this.getAddressFromPublicKey(this.getPublicKey(seed, false));
             jwk.owner = `did:${this.chain}:${jwk.ethereumAddress}`;
             jwk.id = `${jwk.owner}#owner`;
             if (includePrivateKey) {
@@ -123,13 +121,17 @@ class MoonMethod {
         }
         return jwk;
     }
+    getPublicKey(privateKey, compressed = true) {
+        const privateKeyBuffer = Buffer.from(Buffer.from(privateKey, 'hex'));
+        let publicKeyBuffer = secp256k1.publicKeyCreate(privateKeyBuffer, compressed);
+        /* remove compressed flag */
+        if (!compressed) publicKeyBuffer = publicKeyBuffer.slice(1);
+        return Buffer.from(publicKeyBuffer).toString('hex');
+    }
     getAddressFromPublicKey(publicKey) {
-        const hashPublicKey = (0, keccak256_1.default)(publicKey).toString('hex');
-        /* Calculate the starting index to get the last twenty bytes. Each byte is represented by 2 characters in a hex string */
-        const startIndex = hashPublicKey.length - 20 * 2;
-        /* Extract the last twenty bytes */
-        const lastTwentyBytes = hashPublicKey.substring(startIndex);
-        return `0x${lastTwentyBytes}`;
+        const publicKeyBuffer = Buffer.from(publicKey, 'hex');
+        const addressBuffer = Buffer.from((0, keccak256_1.default)(publicKeyBuffer)).slice(-20);
+        return `0x${addressBuffer.toString('hex')}`;
     }
 }
 exports.default = MoonMethod;

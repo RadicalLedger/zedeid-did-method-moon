@@ -8,37 +8,38 @@ describe('HD Wallet Moon Method', function () {
 
         const bip32 = BIP32Factory(ecc);
         const masterNode = bip32.fromSeed(Buffer.from(seed, 'hex'));
+        const etherNode = masterNode.derivePath("m/44'/60'/0'/0/0");
 
         const moonMethod = new MoonMethod();
-        const keys = await moonMethod.getKeys(masterNode);
+        const keys = await moonMethod.getKeys(etherNode);
 
         expect(keys).toEqual({
-            did: 'did:moon:0x3e8d22cb05668dc2d148bcb7d16d0c8127930dca',
-            address: '0x3e8d22cb05668dc2d148bcb7d16d0c8127930dca',
-            privateKey: 'e8f32e723decf4051aefac8e2c93c9c5b214313817cdb01a1494b917c8436b35',
-            publicKey: '0339a36013301597daef41fbe593a02cc513d0b55527ec2df1050e2e8ff49c85c2',
-            chainCode: '873dff81c02f525623fd1fe5167eac3a55a049de3d314bb42ee227ffed37d508',
+            did: 'did:moon:0x022b971dff0c43305e691ded7a14367af19d6407',
+            address: '0x022b971dff0c43305e691ded7a14367af19d6407',
+            privateKey: 'e22f5526ce620ec69441c3453d7a0acbc26c3fc7543023f338123fd45c7d44b3',
+            publicKey: '03844a5d329470697de9926c9c98839ea33b6dd9507a896194ae2b91d71faa16d6',
+            chainCode: 'dac0c414d5006b7350e3b7750e5b535af7ecd9b5a2ad00648d427349885f4358',
             didDocument: {
                 '@context': 'https://w3id.org/did/v1',
-                id: 'did:moon:0x3e8d22cb05668dc2d148bcb7d16d0c8127930dca',
+                id: 'did:moon:0x022b971dff0c43305e691ded7a14367af19d6407',
                 publicKey: [
                     {
-                        id: 'did:moon:0x3e8d22cb05668dc2d148bcb7d16d0c8127930dca#owner',
-                        owner: 'did:moon:0x3e8d22cb05668dc2d148bcb7d16d0c8127930dca',
+                        id: 'did:moon:0x022b971dff0c43305e691ded7a14367af19d6407#owner',
+                        owner: 'did:moon:0x022b971dff0c43305e691ded7a14367af19d6407',
                         type: 'Secp256k1VerificationKey2018',
-                        ethereumAddress: '0x3e8d22cb05668dc2d148bcb7d16d0c8127930dca'
+                        ethereumAddress: '0x022b971dff0c43305e691ded7a14367af19d6407'
                     }
                 ],
                 authentication: [
                     {
                         type: 'Secp256k1SignatureAuthentication2018',
-                        publicKey: 'did:moon:0x3e8d22cb05668dc2d148bcb7d16d0c8127930dca#owner'
+                        publicKey: 'did:moon:0x022b971dff0c43305e691ded7a14367af19d6407#owner'
                     }
                 ],
                 assertionMethod: [
                     {
                         type: 'Secp256k1SignatureAuthentication2018',
-                        publicKey: 'did:moon:0x3e8d22cb05668dc2d148bcb7d16d0c8127930dca#owner'
+                        publicKey: 'did:moon:0x022b971dff0c43305e691ded7a14367af19d6407#owner'
                     }
                 ],
                 service: []

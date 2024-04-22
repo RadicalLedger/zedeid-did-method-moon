@@ -27,5 +27,6 @@ export default class MoonMethod {
         seed: string,
         includePrivateKey?: boolean
     ): Promise<VerificationKeyInterface>;
+    private getPublicKey;
     private getAddressFromPublicKey;
 }
