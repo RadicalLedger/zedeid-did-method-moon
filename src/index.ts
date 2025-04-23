@@ -1,5 +1,5 @@
 import * as secp256k1 from 'secp256k1';
-import keccak256 from 'keccak256';
+import { keccak_256 } from '@noble/hashes/sha3';
 
 export default class MoonMethod {
     private chain: string = 'moon';
@@ -135,7 +135,7 @@ export default class MoonMethod {
 
     private getAddressFromPublicKey(publicKey: string): string {
         const publicKeyBuffer = Buffer.from(publicKey, 'hex');
-        const addressBuffer = Buffer.from(keccak256(publicKeyBuffer)).slice(-20);
+        const addressBuffer = Buffer.from(keccak_256(publicKeyBuffer)).slice(-20);
 
         return `0x${addressBuffer.toString('hex')}`;
     }

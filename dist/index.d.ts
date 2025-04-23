@@ -23,20 +23,14 @@ export default class MoonMethod {
      * @param includePrivateKey - include private key
      * @returns {VerificationKeyInterface}
      */
-    createVerificationMethod(
-        seed: string,
-        includePrivateKey?: boolean
-    ): Promise<VerificationKeyInterface>;
+    createVerificationMethod(seed: string, includePrivateKey?: boolean): Promise<VerificationKeyInterface>;
     /**
      *
      * @param seed - seed as a hex string
      * @param includePrivateKey - include private key
      * @returns {VerificationKeyInterface}
      */
-    createRecoveryMethod(
-        seed: string,
-        includePrivateKey?: boolean
-    ): Promise<VerificationKeyInterface>;
+    createRecoveryMethod(seed: string, includePrivateKey?: boolean): Promise<VerificationKeyInterface>;
     private getPublicKey;
     private getAddressFromPublicKey;
 }
