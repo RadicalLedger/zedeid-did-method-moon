@@ -7,7 +7,7 @@
     "scripts": {
         "copy": "cpx src/types/* dist/types",
         "build:ts": "tsc",
-        "build": "yarn build:ts && yarn copy",
+        "build": "rimraf dist && yarn build:ts && yarn copy",
         "test": "jest",
         "coverage": "jest --coverage",
         "lint": "eslint . --ext .ts",
@@ -34,6 +34,7 @@
         "husky": "8.0.1",
         "lint-staged": "13.0.3",
         "prettier": "^3.2.5",
+        "rimraf": "^5.0.5",
         "tiny-secp256k1": "^2.2.3",
         "typescript": "^5.4.2"
     },

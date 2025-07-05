@@ -1,7 +1,7 @@
 interface VerificationKeyInterface {
     id: string;
-    owner: string;
-    ethereumAddress: string;
+    type: string;
+    controller: string;
     [x: string | symbol]: any;
 }
 
@@ -22,12 +22,12 @@ interface BIP32Interface {
 }
 
 interface DidDocumentInterface {
-    '@context'?: string;
+    '@context'?: string | string[];
     id: string;
-    publicKey: Object;
+    verificationMethod: Object;
     authentication: Object;
     assertionMethod: Object;
-    service: Object;
+    service?: Object;
 }
 
 interface CreateDidDocumentInterface {

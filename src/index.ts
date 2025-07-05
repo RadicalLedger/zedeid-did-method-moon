@@ -38,19 +38,19 @@ export default class MoonMethod {
     async getDocument(privateKey: string): Promise<CreateDidDocumentInterface> {
         const verificationKey: VerificationKeyInterface =
             await this.createVerificationMethod(privateKey);
-
-        const authentication = {
-            type: 'Secp256k1SignatureAuthentication2018',
-            publicKey: verificationKey.id
-        };
+        const recoveryMethod: VerificationKeyInterface =
+            await this.createRecoveryMethod(privateKey);
 
         const didDocument = {
-            '@context': 'https://w3id.org/did/v1',
-            id: verificationKey.owner,
-            publicKey: [verificationKey],
-            authentication: [authentication],
-            assertionMethod: [authentication],
-            service: []
+            '@context': [
+                'https://www.w3.org/ns/did/v1',
+                'https://w3id.org/security/suites/secp256k1recovery-2020/v2',
+                'https://w3id.org/security/v3-unstable'
+            ],
+            id: `did:${this.chain}:${this.getAddressFromPublicKey(this.getPublicKey(privateKey, false))}`,
+            verificationMethod: [recoveryMethod, verificationKey],
+            authentication: [recoveryMethod.id, verificationKey.id],
+            assertionMethod: [recoveryMethod.id, verificationKey.id]
         };
 
         return { didDocument };
@@ -68,20 +68,54 @@ export default class MoonMethod {
     ): Promise<VerificationKeyInterface> {
         let jwk: VerificationKeyInterface = {
             id: '',
-            owner: '',
-            type: 'Secp256k1VerificationKey2018',
-            ethereumAddress: ''
+            type: 'EcdsaSecp256k1VerificationKey2019',
+            controller: '',
+            publicKeyHex: ''
         };
         const privateKey = new Uint8Array(Buffer.from(seed, 'hex'));
         const verified = secp256k1.privateKeyVerify(privateKey);
 
         if (verified) {
-            jwk.ethereumAddress = this.getAddressFromPublicKey(this.getPublicKey(seed, false));
-            jwk.owner = `did:${this.chain}:${jwk.ethereumAddress}`;
-            jwk.id = `${jwk.owner}#owner`;
+            let ethereumAddress = this.getAddressFromPublicKey(this.getPublicKey(seed, false));
+            jwk.publicKeyHex = this.getPublicKey(seed);
+            jwk.controller = `did:${this.chain}:${ethereumAddress}`;
+            jwk.id = `${jwk.controller}#delegate-1`;
 
             if (includePrivateKey) {
-                jwk.publicKeyHex = privateKey;
+                jwk.privateKeyHex = privateKey;
+            }
+        }
+
+        return jwk;
+    }
+
+    /**
+     *
+     * @param seed - seed as a hex string
+     * @param includePrivateKey - include private key
+     * @returns {VerificationKeyInterface}
+     */
+    async createRecoveryMethod(
+        seed: string,
+        includePrivateKey: boolean = false
+    ): Promise<VerificationKeyInterface> {
+        let jwk: VerificationKeyInterface = {
+            id: '',
+            type: 'EcdsaSecp256k1RecoveryMethod2020',
+            controller: '',
+            blockchainAccountId: ''
+        };
+        const privateKey = new Uint8Array(Buffer.from(seed, 'hex'));
+        const verified = secp256k1.privateKeyVerify(privateKey);
+
+        if (verified) {
+            let ethereumAddress = this.getAddressFromPublicKey(this.getPublicKey(seed, false));
+            jwk.blockchainAccountId = `eip155:1287:${ethereumAddress}`;
+            jwk.controller = `did:${this.chain}:${ethereumAddress}`;
+            jwk.id = `${jwk.controller}#controller`;
+
+            if (includePrivateKey) {
+                jwk.privateKeyHex = privateKey;
             }
         }
 
